@@ -1,0 +1,8 @@
+.box1{
+    width: 100px;
+    height: 100px;
+    /* background-color: red; */
+    background: url('../images/1.png') ;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
