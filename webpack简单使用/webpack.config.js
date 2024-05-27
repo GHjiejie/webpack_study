@@ -1,7 +1,10 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+// 将css打包为一个文件
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// 将上面打包的文件进行一个压缩
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 module.exports = {
   entry: "./src/index.js",
   output: {
@@ -18,12 +21,14 @@ module.exports = {
       // 处理css文件
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        // use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       // 处理scss文件
       {
         test: /\.s[ac]ss$/i,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        // use: ["style-loader", "css-loader", "sass-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       },
       // 处理图片文件
       {
@@ -54,8 +59,18 @@ module.exports = {
       // cleanOnceBeforeBuildPatterns: ["**/*"],
     }),
     // 将css打包成一个css文件
-    new MiniCssExtractPlugin({}),
+    new MiniCssExtractPlugin({
+      // 设置css文件的输出路径
+      filename: "css/[name].[contenthash:8].css",
+    }),
+    // 压缩css文件
+    new CssMinimizerPlugin(),
   ],
+
+  // 配置代码优化选项
+  // optimization: {
+  //   minimizer: [new CssMinimizerPlugin()],
+  // },
 
   // 配置开发服务器
 
