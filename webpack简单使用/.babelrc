@@ -1,0 +1,8 @@
+// 这个文件是babel的配置文件，用于配置babel的转码规则，这里我们使用了@babel/preset-env这个插件，它可以根据我们配置的目标环境，自动将ES6+的代码转换为ES5的代码。
+
+{
+  // 智能预设，作用是根据目标环境自动转换代码(向下兼容)
+  "presets": ["@babel/preset-env"],
+
+  "plugins": ["@babel/plugin-transform-runtime"]
+}

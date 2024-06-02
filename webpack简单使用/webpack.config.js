@@ -8,7 +8,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 module.exports = {
   entry: "./src/index.js",
   output: {
-    filename: "main.js",
+    filename: "js/main.js",
     path: path.resolve(__dirname, "dist"),
     // 设置资源模块的输出路径，通常不这样设置，因为这里只有一个资源模块，所以设置为images,需要考虑到后面还有很多不同类型的资源模块
     // assetModuleFilename: "images/[hash][ext][query]",
@@ -22,13 +22,44 @@ module.exports = {
       {
         test: /\.css$/,
         // use: ["style-loader", "css-loader"],
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        // use: [MiniCssExtractPlugin.loader, "css-loader"],
+
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "postcss-loader",
+          // 我们可以将下面的配置放在postcss.config.js文件中，也可以直接在这里配置
+          // {
+          //   loader: "postcss-loader",
+          //   options: {
+          //     postcssOptions: {
+          //       plugins: ["postcss-preset-env"],
+          //     },
+          //   },
+          // },
+        ],
       },
       // 处理scss文件
       {
         test: /\.s[ac]ss$/i,
         // use: ["style-loader", "css-loader", "sass-loader"],
-        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+        // use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+        // 我们使用postcss-loader来处理css文件，所以这里要将css-loader放在postcss-loader之前
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "postcss-loader", //代码读取到这里的时候，会先去找postcss.config.js文件，然后根据这个文件中的配置来处理css文件
+          // 我们可以将下面的配置放在postcss.config.js文件中，也可以直接在这里配置
+          // {
+          //   loader: "postcss-loader",
+          //   options: {
+          //     postcssOptions: {
+          //       plugins: ["postcss-preset-env"],
+          //     },
+          //   },
+          // },
+          "sass-loader",
+        ],
       },
       // 处理图片文件
       {
@@ -43,6 +74,24 @@ module.exports = {
         // 设置单独文件资源输出路径
         generator: {
           filename: "images/[hash:10][ext][query]",
+        },
+      },
+
+      // 使用babel处理js文件
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          // 可以直接在这里设置预设,也可以在.babelrc等(比如babel.config.js)文件中设置
+          // options: {
+          //   // 设置预设
+          //   presets: ["@babel/preset-env"],
+          // },
+        },
+        // 设置单独文件资源输出路径
+        generator: {
+          filename: "js/[hash:10][ext][query]",
         },
       },
     ],
@@ -68,9 +117,11 @@ module.exports = {
   ],
 
   // 配置代码优化选项
-  // optimization: {
-  //   minimizer: [new CssMinimizerPlugin()],
-  // },
+  optimization: {
+    // 设置为true,表示开启代码压缩,在开发环境下默认是false,在生产环境下默认是true
+    minimize: true,
+    minimizer: [new CssMinimizerPlugin()],
+  },
 
   // 配置开发服务器
 
