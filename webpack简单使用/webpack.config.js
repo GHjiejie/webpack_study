@@ -5,6 +5,9 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // 将上面打包的文件进行一个压缩
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
+const WebpackBar = require("webpackbar");
+
 module.exports = {
   entry: "./src/index.js",
   output: {
@@ -14,89 +17,112 @@ module.exports = {
     // assetModuleFilename: "images/[hash][ext][query]",
     // clean: true, //这个方法调用的是底层的fs.rm()方法，所以不会有任何文件被移动到系统的垃圾箱，而是直接删除，所以要小心使用（不推荐）
   },
-
   // 设置模块
+  // module: {
+  //   rules: [
+  //     // 处理css文件
+
+  //     {
+  //       test: /\.css$/,
+  //       use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+  //     },
+  //     // 处理scss文件
+  //     {
+  //       test: /\.s[ac]ss$/i,
+
+  //       use: [
+  //         MiniCssExtractPlugin.loader,
+  //         "css-loader",
+  //         "postcss-loader",
+
+  //         "sass-loader",
+  //       ],
+  //     },
+  //     // 处理图片文件
+  //     {
+  //       test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
+  //       type: "asset",
+  //       // 配置资源文件的解析方式，小于8kb的资源文件会被解析为base64格式，大于8kb的资源文件会被解析为资源模块
+  //       parser: {
+  //         dataUrlCondition: {
+  //           maxSize: 8 * 1024, // 8kb
+  //         },
+  //       },
+  //       // 设置单独文件资源输出路径
+  //       generator: {
+  //         filename: "images/[hash:10][ext][query]",
+  //       },
+  //     },
+
+  //     // 使用babel处理js文件
+  //     {
+  //       test: /\.js$/,
+  //       exclude: /node_modules/,
+  //       use: {
+  //         loader: "babel-loader",
+  //         // 可以直接在这里设置预设,也可以在.babelrc等(比如babel.config.js)文件中设置
+  //         // options: {
+  //         //   // 设置预设
+  //         //   presets: ["@babel/preset-env"],
+  //         // },
+  //       },
+  //       // 设置单独文件资源输出路径
+  //       generator: {
+  //         filename: "js/[hash:10][ext][query]",
+  //       },
+  //     },
+  //   ],
+  // },
   module: {
     rules: [
-      // 处理css文件
       {
-        test: /\.css$/,
-        // use: ["style-loader", "css-loader"],
-        // use: [MiniCssExtractPlugin.loader, "css-loader"],
-
-        use: [
-          MiniCssExtractPlugin.loader,
-          "css-loader",
-          "postcss-loader",
-          // 我们可以将下面的配置放在postcss.config.js文件中，也可以直接在这里配置
-          // {
-          //   loader: "postcss-loader",
-          //   options: {
-          //     postcssOptions: {
-          //       plugins: ["postcss-preset-env"],
-          //     },
-          //   },
-          // },
+        test: /\.(css|s[ac]ss)$/i,
+        oneOf: [
+          // 处理css文件
+          {
+            test: /\.css$/,
+            use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+          },
+          // 处理scss文件
+          {
+            test: /\.s[ac]ss$/i,
+            use: [
+              MiniCssExtractPlugin.loader,
+              "css-loader",
+              "postcss-loader",
+              "sass-loader",
+            ],
+          },
         ],
       },
-      // 处理scss文件
-      {
-        test: /\.s[ac]ss$/i,
-        // use: ["style-loader", "css-loader", "sass-loader"],
-        // use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-        // 我们使用postcss-loader来处理css文件，所以这里要将css-loader放在postcss-loader之前
-        use: [
-          MiniCssExtractPlugin.loader,
-          "css-loader",
-          "postcss-loader", //代码读取到这里的时候，会先去找postcss.config.js文件，然后根据这个文件中的配置来处理css文件
-          // 我们可以将下面的配置放在postcss.config.js文件中，也可以直接在这里配置
-          // {
-          //   loader: "postcss-loader",
-          //   options: {
-          //     postcssOptions: {
-          //       plugins: ["postcss-preset-env"],
-          //     },
-          //   },
-          // },
-          "sass-loader",
-        ],
-      },
-      // 处理图片文件
       {
         test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
         type: "asset",
-        // 配置资源文件的解析方式，小于8kb的资源文件会被解析为base64格式，大于8kb的资源文件会被解析为资源模块
         parser: {
           dataUrlCondition: {
             maxSize: 8 * 1024, // 8kb
           },
         },
-        // 设置单独文件资源输出路径
         generator: {
           filename: "images/[hash:10][ext][query]",
         },
       },
-
-      // 使用babel处理js文件
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          // 可以直接在这里设置预设,也可以在.babelrc等(比如babel.config.js)文件中设置
-          // options: {
-          //   // 设置预设
-          //   presets: ["@babel/preset-env"],
-          // },
-        },
-        // 设置单独文件资源输出路径
-        generator: {
-          filename: "js/[hash:10][ext][query]",
-        },
+        oneOf: [
+          {
+            use: {
+              loader: "babel-loader",
+            },
+            generator: {
+              filename: "js/[hash:10][ext][query]",
+            },
+          },
+        ],
       },
     ],
   },
-
   // 配置插件
   plugins: [
     new HtmlWebpackPlugin({
@@ -114,6 +140,8 @@ module.exports = {
     }),
     // 压缩css文件
     new CssMinimizerPlugin(),
+    // 显示打包进度
+    new WebpackBar(),
   ],
 
   // 配置代码优化选项

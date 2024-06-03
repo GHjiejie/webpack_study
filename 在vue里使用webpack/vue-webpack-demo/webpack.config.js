@@ -6,10 +6,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // 将上面打包的文件进行一个压缩
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
+// 添加打包进度条反馈
+const WebpackBar = require('webpackbar');
 module.exports = {
   entry: "./src/main.js",
   output: {
-    filename: "js/main.js",
+    filename: "js/bundle.js",
     path: path.resolve(__dirname, "dist"),
     // 设置资源模块的输出路径，通常不这样设置，因为这里只有一个资源模块，所以设置为images,需要考虑到后面还有很多不同类型的资源模块
     // assetModuleFilename: "images/[hash][ext][query]",
@@ -122,6 +124,7 @@ module.exports = {
     new CssMinimizerPlugin(),
     // 处理vue文件
     new VueLoaderPlugin(),
+    new WebpackBar()
   ],
 
   // 配置代码优化选项
